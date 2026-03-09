@@ -1,0 +1,42 @@
+<table class="table text-lg w-full">
+
+    <thead>
+    <tr>
+        <th>Hora</th>
+        <th>Δ min</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    {% for r in rows %}
+
+        <tr>
+
+            <td class="font-mono opacity-60 mr-1">
+                {{ r.time|time:"H:i" }}
+            </td>
+
+            <td class="font-semibold flex gap-2 items-center">
+
+                {% if r.gap %}
+                    <span class="font-mono mr-1 min-w-[30px]">{{ r.gap }}'</span>
+                    <div class="flex gap-1 flex-wrap items-center">
+                        {% for _ in r.dots %}
+                            <div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                        {% endfor %}
+                        {% if r.overflow %}
+                            <span class="opacity-40 text-sm ml-1">· · ·</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>

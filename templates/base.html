@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <title>Event Logger</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.css"
+        rel="stylesheet"
+    >
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/static/sw.js")
+        }
+    </script>
+
+    <meta
+        name="theme-color"
+        content="#3b82f6"
+    >
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+    class="bg-base-200"
+>
+
+<div class="navbar bg-base-100 shadow">
+
+    <div class="flex-1">
+        <a class="btn btn-ghost text-xl">
+            Event Logger
+        </a>
+    </div>
+
+    <div class="flex-none">
+
+        {% if user.is_authenticated %}
+
+            <span class="mr-4">{{ user.username }}</span>
+
+            <a
+                href="/accounts/logout/"
+                class="btn btn-outline btn-sm"
+            >
+                Logout
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="container mx-auto p-6">
+
+    {% block content %}
+
+    {% endblock %}
+
+</div>
+
+<script>
+
+    // Se llama cuando HTMX inyecta el partial del chart
+    function renderChart() {
+        console.log('renderChart')
+
+        const canvas = document.getElementById("eventsChart")
+        if (!canvas) {
+            console.error('No canvas found!')
+            return
+        }
+
+        const existing = Chart.getChart(canvas)
+        if (existing) {
+            console.log('destroying existing canvas')
+            existing.destroy()
+        }
+
+        const labels = JSON.parse(canvas.dataset.labels)
+        const data = JSON.parse(canvas.dataset.values)
+
+        const textColor = "#e5e7eb"
+        const gridColor = "rgba(255,255,255,0.1)"
+
+
+        window.eventsChartInstance = new Chart(canvas, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Eventos",
+                    data: data,
+                    backgroundColor: "#60a5fa"
+                }]
+            },
+            options: {
+                animation: false,
+                plugins: {
+                    legend: {
+                        labels: { color: textColor }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: textColor }, grid: { color: gridColor }},
+                    y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true}
+                }
+
+            }
+        })
+    }
+
+    // afterSettle espera a que HTMX termine TODO (incluido swaps anidados)
+    document.body.addEventListener("htmx:afterSettle", function(evt) {
+        if (document.getElementById("eventsChart")) {
+            renderChart()
+        }
+    })
+
+</script>
+<script>
+
+    function formatTimeSince(isoString) {
+        if (!isoString) return "nunca"
+        const diff = Math.floor((Date.now() - new Date(isoString)) / 1000)
+        if (diff < 60) return "ahora"
+        const mins = Math.floor(diff / 60)
+        if (mins < 60) return `hace ${mins} min`
+        const hours = Math.floor(mins / 60)
+        return `hace ${hours} h`
+    }
+
+    function tickLastEvent() {
+        const el = document.getElementById("last-event")
+        if (!el) return
+        el.innerText = "Último evento: " + formatTimeSince(el.dataset.last)
+    }
+
+    setInterval(tickLastEvent, 10000)
+    document.addEventListener("DOMContentLoaded", tickLastEvent)
+
+</script>
+<script>
+    document.body.addEventListener("eventLogged", () => {
+
+        const btn = document.querySelector("#btn-log-event")
+        btn.classList.add("animate-pulse")
+        setTimeout(() => btn.classList.remove("animate-pulse"), 300)
+
+        const el = document.getElementById("last-event")
+        if (el) {
+            el.dataset.last = new Date().toISOString()
+            tickLastEvent()
+        }
+
+        if (navigator.vibrate) navigator.vibrate(40)
+
+    })
+
+    document.body.addEventListener("eventUndo", (e) => {
+        console.log('eventUndo', e)
+        const btn = document.querySelector("#btn-undo")
+        btn.classList.add("animate-pulse")
+        setTimeout(() => btn.classList.remove("animate-pulse"), 300)
+
+        const el = document.getElementById("last-event")
+        if (el) {
+            el.dataset.last = e.detail.ts || ""
+            tickLastEvent()
+        }
+
+        const canvas = document.getElementById("eventsChart")
+
+        if (navigator.vibrate) navigator.vibrate(20)
+    })
+
+    document.body.addEventListener("eventRedo", (e) => {
+        console.log('eventRedo', e)
+        const btn = document.querySelector("#btn-redo")
+        btn.classList.add("animate-pulse")
+        setTimeout(() => btn.classList.remove("animate-pulse"), 300)
+
+        const el = document.getElementById("last-event")
+        if (el) {
+            el.dataset.last = e.detail.ts || ""
+            tickLastEvent()
+        }
+
+        if (navigator.vibrate) navigator.vibrate(20)
+
+    })
+</script>
+</body>
+
+</html>

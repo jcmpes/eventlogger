@@ -1,0 +1,20 @@
+{
+    "name": "Event Logger",
+    "short_name": "Logger",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#3b82f6",
+    "icons": [
+        {
+            "src": "/static/icons/icon-32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/icons/icon-256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        }
+    ]
+}
