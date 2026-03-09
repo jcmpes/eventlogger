@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="w-full max-w-sm">
+
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold">Bienvenido</h1>
+            <p class="text-base-content/50 mt-1">Inicia sesión para continuar</p>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body gap-4">
+
+                {% if form.errors %}
+                <div class="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+                    </svg>
+                    <span>Usuario o contraseña incorrectos.</span>
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-control mb-4">
+                        <label class="label pb-1">
+                            <span class="label-text font-medium">Usuario</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="{{ form.login.html_name }}"
+                            placeholder="tu usuario"
+                            class="input input-bordered w-full focus:input-primary"
+                            value="{{ form.login.value|default:'' }}"
+                            autofocus
+                        >
+                    </div>
+
+                    <div class="form-control mb-6">
+                        <label class="label pb-1">
+                            <span class="label-text font-medium">Contraseña</span>
+                        </label>
+                        <input
+                            type="password"
+                            name="{{ form.password.html_name }}"
+                            placeholder="••••••••"
+                            class="input input-bordered w-full focus:input-primary"
+                        >
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full text-base">
+                        Entrar
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <p class="text-center mt-6 text-sm text-base-content/50">
+            ¿No tienes cuenta?
+            <a href="{% url 'account_signup' %}" class="link link-primary font-medium">Regístrate</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}

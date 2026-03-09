@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center">
+    <div class="w-full max-w-sm">
+
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold">Crear cuenta</h1>
+            <p class="text-base-content/50 mt-1">Regístrate para empezar</p>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body gap-4">
+
+                {% if form.errors %}
+                <div class="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+                    </svg>
+                    <span>Por favor corrige los errores del formulario.</span>
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="form-control mb-4">
+                        <label class="label pb-1">
+                            <span class="label-text font-medium">Usuario</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="{{ form.username.html_name }}"
+                            placeholder="tu usuario"
+                            class="input input-bordered w-full focus:input-primary"
+                            value="{{ form.username.value|default:'' }}"
+                            autofocus
+                        >
+                        {% if form.username.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.username.errors|striptags }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-control mb-4">
+                        <label class="label pb-1">
+                            <span class="label-text font-medium">Email <span class="text-base-content/40 font-normal">(opcional)</span></span>
+                        </label>
+                        <input
+                            type="email"
+                            name="{{ form.email.html_name }}"
+                            placeholder="tu@email.com"
+                            class="input input-bordered w-full focus:input-primary"
+                            value="{{ form.email.value|default:'' }}"
+                        >
+                    </div>
+
+                    <div class="form-control mb-4">
+                        <label class="label pb-1">
+                            <span class="label-text font-medium">Contraseña</span>
+                        </label>
+                        <input
+                            type="password"
+                            name="{{ form.password1.html_name }}"
+                            placeholder="••••••••"
+                            class="input input-bordered w-full focus:input-primary"
+                        >
+                        {% if form.password1.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.password1.errors|striptags }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-control mb-6">
+                        <label class="label pb-1">
+                            <span class="label-text font-medium">Repite la contraseña</span>
+                        </label>
+                        <input
+                            type="password"
+                            name="{{ form.password2.html_name }}"
+                            placeholder="••••••••"
+                            class="input input-bordered w-full focus:input-primary"
+                        >
+                        {% if form.password2.errors %}
+                            <span class="text-error text-xs mt-1">{{ form.password2.errors|striptags }}</span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full text-base">
+                        Crear cuenta
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+        <p class="text-center mt-6 text-sm text-base-content/50">
+            ¿Ya tienes cuenta?
+            <a href="{% url 'account_login' %}" class="link link-primary font-medium">Inicia sesión</a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}
