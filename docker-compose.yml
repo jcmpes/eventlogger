@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    restart: always
+    env_file: .env
+    volumes:
+      - static:/app/staticfiles
+      - db:/app/db
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  static:
+  db:
